@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # own
     'todo',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -123,3 +124,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# login / logout
+LOGIN_REDIRECT_URL = '/todo/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
