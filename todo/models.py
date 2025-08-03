@@ -1,11 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from PIL import Image
+from pathlib import Path
+from io import BytesIO
 
-from django.urls import reverse
-
-from PIL import Image  # 추가
-from pathlib import Path  # 추가
-from io import BytesIO  # 추가
 
 User = get_user_model()
 

@@ -9,18 +9,23 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 환경변수
+with open(BASE_DIR / '.secret_config' / 'secret.json') as f:
+    config_secret_str = f.read()
+
+SECRET = json.loads(config_secret_str)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5hv+=xf1sva=(04xtv6&y0s1()gp=%l75com*w6ax+f=#iy_y&'
+SECRET_KEY = SECRET.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,7 +56,6 @@ THIRD_PARTY_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -136,61 +140,73 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / '.static_root'
 
-# media 경로 설정하기 - static 설정 아래에 추가
+# Media files
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# auth
+AUTH_USER_MODEL = 'users.User'
+
 # login / logout
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/cbv/todo/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# Summernote 설정
+# summernote
 SUMMERNOTE_CONFIG = {
-    # HTML 태그 또는 JS를 수정하지 못하도록 iframe 설정
     'iframe': True,
 
+    # You can put custom Summernote settings
     'summernote': {
-        # airMode 비활성화: 툴바를 항상 표시하도록 설정
+        # As an example, using Summernote Air-mode
         'airMode': False,
 
-        # 에디터의 사이즈 정의
-        'width': '100%',    # 에디터의 너비를 100%로 설정
-        'height': '480',    # 에디터의 높이를 480px로 설정
+        # Change editor size
+        'width': '100%',
+        'height': '480',
 
-        # 에디터의 툴바 메뉴 정의
+        # Toolbar customization
+        # https://summernote.org/deep-dive/#custom-toolbar-popover
         'toolbar': [
-            ['style', ['style']],                      # 스타일 설정
-            ['font', ['bold', 'underline', 'clear']],  # 글꼴 설정: 굵게, 밑줄, 지우기
-            ['color', ['color']],                      # 색상 설정
-            ['para', ['ul', 'ol', 'paragraph']],       # 문단 설정: 글머리 기호, 번호 매기기, 문단
-            ['table', ['table']],                      # 표 삽입
-            ['insert', ['link', 'picture']],           # 삽입 기능: 링크, 그림
-            ['view', ['fullscreen']],                  # 보기 설정: 전체 화면
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture']],
+            ['view', ['fullscreen']],
         ],
 
-        # 에디터 언어 정의
-        'lang': 'ko-KR',  # 에디터의 언어를 한국어로 설정
+        # Or, explicitly set language/locale for editor
+        'lang': 'ko-KR',
 
-        # 코드미러 설정
         'codemirror': {
-            'mode': 'htmlmixed',     # 코드미러의 모드를 htmlmixed로 설정
-            'lineNumbers': 'true',   # 코드미러에서 줄 번호를 표시
-            'theme': 'monokai',      # 코드미러의 테마를 monokai로 설정
+            'mode': 'htmlmixed',
+            'lineNumbers': 'true',
+            # You have to include theme file in 'css' or 'css_for_inplace' before using it.
+            'theme': 'monokai',
         },
     },
 
-    # 첨부파일 인증 필요 여부 설정
+    # Require users to be authenticated for uploading attachments.
     'attachment_require_authentication': True,
 
-    # 첨부파일 기능 비활성화 설정
+    # You can completely disable the attachment feature.
     'disable_attachment': False,
 
-    # 첨부파일의 절대경로 URI 사용 설정
+    # Set to `False` to return attachment paths in relative URIs.
     'attachment_absolute_uri': True,
 }
+
+# email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.naver.com'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+EMAIL_HOST_USER = SECRET['EMAIL']['USER']
+EMAIL_HOST_PASSWORD = SECRET['EMAIL']['PASSWORD']
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

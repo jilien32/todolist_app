@@ -23,7 +23,7 @@ class TodoListView(LoginRequiredMixin, ListView):
 
         q = self.request.GET.get('q')
         if q:
-            queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
+            queryset = queryset.filter(Q(title__icontains=q) | Q(content__icontains=q))
         return queryset
 
 
@@ -53,7 +53,6 @@ class TodoDetailView(LoginRequiredMixin, DetailView):
 class TodoCreateView(LoginRequiredMixin, CreateView):
     model = Todo
     template_name = 'todo/todo_create.html'
-    # 기존에 fields를 선언하여 form을 생성하던 방법에서 TodoForm을 불러와서 사용
     form_class = TodoForm
 
     def form_valid(self, form):
@@ -69,7 +68,6 @@ class TodoCreateView(LoginRequiredMixin, CreateView):
 class TodoUpdateView(LoginRequiredMixin, UpdateView):
     model = Todo
     template_name = 'todo/todo_update.html'
-    # 기존에 fields를 선언하여 form을 생성하던 방법에서 TodoForm을 불러와서 사용
     form_class = TodoUpdateForm
 
     def get_object(self, queryset=None):
